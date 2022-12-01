@@ -1,12 +1,12 @@
-/* © 2022 MSOE
+/* Copyright (C) 2022 MSOE
  *
  * All Rights Reserved
  * You may not use, distribute or modify this code without the
  * express written permission of MSOE
  *
  * Contact Info
- * 608-312-5950
  * jorgejuradogarcia2@gmail.com
+ * 608-312-5950
  *
  */
 
@@ -19,6 +19,14 @@
 
 #ifndef TRUE
 #define TRUE 1
+#endif
+
+#ifndef PRESSED
+#define PRESSED 0
+#endif
+
+#ifndef NOT_PRESSED
+#define NOT_PRESSED 1
 #endif
 
 #ifndef FALSE

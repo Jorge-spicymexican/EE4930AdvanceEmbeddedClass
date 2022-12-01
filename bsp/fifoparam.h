@@ -1,15 +1,12 @@
-/* Copyright (C) 2017 TCI LLC
+/* Copyright (C) 2022 MSOE
  *
  * All Rights Reserved
  * You may not use, distribute or modify this code without the
- * express written permission of TCI, LLC
+ * express written permission of MSOE
  *
  * Contact Info
- * www.transcoil.com
- * 414-357-4480
- * tech-support@transcoil.com
- * TCI, LLC
- * Germantown WI, 53022 USA
+ * jorgejuradogarcia2@gmail.com
+ * 608-312-5950
  *
  */
 
