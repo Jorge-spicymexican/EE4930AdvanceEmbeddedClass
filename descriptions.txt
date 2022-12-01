@@ -1,0 +1,16 @@
+Coverage
+	This LCOV report current reports the two main directories (App,BSP) that are being tested with the Check C Framework. Check: https://libcheck.github.io/check/.
+	Mocking and stubbing for for complex modules is currently still under development
+
+Check_money
+	Testing File given from Check-C developers, basic Functionallity testing
+
+Check_Fifoparam
+	Testing the fifoparameter module from BSP directory, validating dequeing and queing of data 
+
+
+Contact
+	Questions/Concerns of CHECK-C or LCOV: jorgejuradogarcia2@gmail.com or (608) 312-5950
+	
+
+
