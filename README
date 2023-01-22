@@ -1,4 +1,4 @@
-This is the directions to run UnitTesting for TCI C Code
+This is the directions to run UnitTesting for  C Code
 This demonstrates using Check along with one of two build systems:
 CMake and LCOV.
 
