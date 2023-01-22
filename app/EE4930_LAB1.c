@@ -53,7 +53,7 @@ void Init_Lab1( void )
     GPIO_setOutputLowOnPin( GPIO_PORT_P2, GPIO_PIN2 ); //Set P2.2 Low
 
     //Printing "EE4930-011" on the first line of the LCD screen
-    LCD_goto_xy(0,1);
+    LCD_goto_xy(0,0);
     LCD_print_str("EE4930-011");
 
 
@@ -88,37 +88,39 @@ void Lab1_Poll( void )
 
 void PushButton_Pressed( void )
 {
-    //turn on an LED
+    //Turn off an LED
     GPIO_setOutputHighOnPin( GPIO_PORT_P2, GPIO_PIN2 ); //Set P2.2 Low
 
-    // Display text on the second and third row
-    LCD_goto_xy(0,2);
-    LCD_print_str("OFF");
+
+    // Display text on the second and fourth row
+    LCD_goto_xy(0,1);
+    LCD_print_str("ON ");
 
     LCD_goto_xy(0,3);
-    LCD_print_str("Jorge");
+    LCD_print_str("Jurado");
 
-    LCD_goto_xy(0,4);
-    //blank out the Fourth row
+    LCD_goto_xy(0,2);
+
+    //blank out the third row
     LCD_print_str("            "); //clearing by writing nothing
 
 }
 
 void PushButton_NotPressed( void )
 {
-   //Turn off an LED
-   GPIO_setOutputLowOnPin( GPIO_PORT_P2, GPIO_PIN2 ); //Set P2.2 Low
 
-   // Display text on the second and fourth row
+   //turn on an LED
+    GPIO_setOutputLowOnPin( GPIO_PORT_P2, GPIO_PIN2 ); //Set P2.2 Low
+
+   // Display text on the second and third row
+   LCD_goto_xy(0,1);
+   LCD_print_str("OFF");
+
    LCD_goto_xy(0,2);
-   LCD_print_str("ON ");
-
-   LCD_goto_xy(0,4);
-   LCD_print_str("Jurado");
+   LCD_print_str("Jorge");
 
    LCD_goto_xy(0,3);
-
-   //blank out the third row
+   //blank out the Fourth row
    LCD_print_str("            "); //clearing by writing nothing
 
 }
