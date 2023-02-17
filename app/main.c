@@ -20,8 +20,11 @@
 #define LAB1_ON FALSE
 #define LAB2_ON FALSE
 #define LAB3_ON FALSE
-#define LAB4_ON TRUE
-#define CLEAR 21
+#define LAB4_ON FALSE
+#define LAB5_ON FALSE
+#define LAB6_ON FALSE
+#define FINAL_EXAM TRUE
+
 
 
 // Lab modules
@@ -31,6 +34,11 @@
 
 #if LAB2_ON
 #include "EE4930_LAB2.h"
+//global variables for Lab 2
+unsigned adc_val;
+float ADC_Percentage;
+float PWM_dutycycle;
+int Calculated_dutycycle;
 #endif
 
 #if LAB3_ON
@@ -40,28 +48,40 @@
 
 #if LAB4_ON
 #include "EE4930_LAB4.h"
-#endif
-
-/*
- * main.c
- */
-
-//global variables for Lab 2
-unsigned adc_val;
-float ADC_Percentage;
-float PWM_dutycycle;
-int Calculated_dutycycle;
-
-
 //global variables for Lab4
 unsigned adc_val_A0;
 unsigned adc_val_A2;
 float ADC_A2_Percentage;
 float ADC_A0_Percentage;
 unsigned char ticks;
-
 eSystemInputs Inputs;
+#endif
 
+
+
+#if LAB5_ON
+#include "EE4930_LAB5.h"
+//global variables for Lab5
+volatile float temp=0;
+volatile int adc_value=0;
+volatile char Ready = FALSE;
+// Defines
+#define MAX_12BIT_ADC_RANGE 4096
+#endif
+
+#if LAB6_ON
+
+#endif
+
+
+#if FINAL_EXAM
+#include "EE4930_FINAL_EXAM.h"
+eSystemInputs Inputs;
+#endif
+
+/*
+ * main.c
+ */
 int main(void){
 
 #if LAB1_ON
@@ -77,10 +97,6 @@ int main(void){
     Clock_Init_48MHz();
     Init_Lab2();
 
-    NVIC->ISER[0] |= ( 1<<24 ); //NVIC for ADC14 at ISER[24]
-    NVIC->ISER[1] |= ( 1<<3 ); //NVIC for PORT 1 at ISER[35]
-    NVIC->ISER[0] |= ( 1<<25 ); //NVIC for TIMER_32_1 at ISER[25]
-    __enable_interrupt();
 
     while(1)
     {
@@ -126,12 +142,6 @@ int main(void){
 #if LAB4_ON
     Clock_Init_48MHz();
 
-    //Interrupt setup
-    NVIC->ISER[0] |= ( 1<<24 ); //NVIC for ADC14 at ISER[24]
-    NVIC->ISER[1] |= ( 1 << 3 ); //NVIC for PORT 1 at ISER[35]
-    NVIC->ISER[0] |= ( 1<<25 ); //NVIC for TIMER_32_1 at ISER[25]
-
-    __enable_interrupt();
     Dehumidifier_init();
 
     eSystemEvent eNewEvent = Last_event;
@@ -148,10 +158,61 @@ int main(void){
             eNewEvent = Dehumidifier_ReadEvent();
 
 
+#if !EXAM1_SECTION1
             //poll of the state machine
             eNextState = Dehumidifier_Poll(eNewEvent, eNextState );
+#else
+            eNextState = Dehumidifier_IfElse(eNewEvent, eNextState );
+#endif
         }
+    }
 
+#endif
+
+#if LAB5_ON
+
+    Init_PCM(); //setup for power control module
+    init_CS();  //setup for clock system
+    //Init the watchdog timer
+    Init_Watchdog();
+
+    //Init the Temperature Sensor
+    Init_Temp();
+
+    ADC14->CTL0 |= ADC14_CTL0_SC; // start a new ADC conversion
+    //Processor Peripherals
+    //System control register
+    SCB->SCR = SCB_SCR_SLEEPDEEP_Msk;
+
+    while(1)
+    {
+        __wfi();   // wait in LPM3 for watchdog
+
+        while(!Ready);
+
+        Ready = FALSE;
+        P4->OUT &= ~BIT5;            // end indication
+        printf("Temperature Value: %f F\n", temp);
+
+    }
+
+#endif
+
+
+#if FINAL_EXAM
+
+    Igloo_init();
+    eSystemEvent eNewEvent = Last_event;
+    eSystemState eNextState  = Off_state;
+
+    while(1)
+    {
+        eNewEvent = Igloo_ReadEvent();
+
+        //poll of the state machine
+        eNextState = Igloo_Poll( eNewEvent, eNextState );
+
+        Igloo_UpdateLCD();
     }
 
 #endif
@@ -262,4 +323,31 @@ void T32_INT1_IRQHandler()
 }
 
 
+#endif
+
+
+#if LAB5_ON
+void ADC14_IRQHandler(void)
+{
+    int readIV = ADC14->IV; // Reading the IV register to cl ear
+    ADC14->CLRIFGR0 = ADC14_CLRIFGR0_CLRIFG0;
+    adc_value = ADC14->MEM[3];
+    float adc_voltage = ( ( (float)(adc_value)/MAX_12BIT_ADC_RANGE ) * (3300.0f));
+    float temp_c = adc_voltage/10 - 50; // y = x10mV/C - 75
+    temp = ( temp_c * (9.0f / 5.0f) ) + 32.0;
+    Ready = TRUE;
+
+}
+
+// Interrupt Handler for the watchdog timer
+void WDT_A_IRQHandler(void)
+{
+    // wakes up from LPM3 into LPM0
+    P4->OUT |= BIT5;          // indicate temp reading is available
+
+    //start a new conversion
+    //sleep the board
+    ADC14->CTL0 |= (ADC14_CTL0_ENC | ADC14_CTL0_SC); // start a new ADC conversion
+
+}
 #endif
